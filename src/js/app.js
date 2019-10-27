@@ -73,7 +73,8 @@ App = {
       console.log("Hello");
       App.tcrInstance = instance;
       console.log(App.tcrInstance.address);
-      return App.tcrInstance.getListingDetails("0x3136443037303035354545343735000000000000000000000000000000000000");
+      // return App.tcrInstance.getListingDetails("0x3136443037303035354545343735000000000000000000000000000000000000");
+      return App.tcrInstance.getDetails();
       // return 10;
     }).then(function(minDeposit) {
       var candidatesResults = $("#candidatesResults");
