@@ -15,19 +15,17 @@ contract Tcr {
     using SafeMath for uint;
 
     struct Data {
-
-	string rollNumber;
-	string course ;
-	string review;
-	uint rating;
-
+        string rollNumber;
+        string course ;
+        string review;
+        uint rating;
 	}
 
     struct Course{
-	string courseCode;
-	uint courseTotal;
-	uint numberOfReviews;
-	uint arrIndex;
+        string courseCode;
+        uint courseTotal;
+        uint numberOfReviews;
+        uint arrIndex;
 	}
 
     struct Listing {
@@ -63,9 +61,6 @@ contract Tcr {
         uint rewardPool;        // number of tokens from losing side - winning reward
         uint totalTokens;       // number of tokens from winning side - to be returned
     }
-
-
-
 
     // Maps challengeIDs to associated challenge data
     mapping(uint => Challenge) private challenges;
@@ -143,7 +138,7 @@ contract Tcr {
 	}
 
     function strReview(Data memory data) private pure returns (string memory){
-	string memory space = " ";
+	    string memory space = " ";
     	return string(abi.encodePacked(data.rollNumber, space, data.course, space, data.review, space, uint2str(data.rating)));
     }
     // returns whether a listing is already whitelisted
@@ -160,27 +155,28 @@ contract Tcr {
     // not to be used in a production use case
     function getAllListings() public view returns (string[] memory, bytes32[] memory, bool[] memory) {
         string[] memory listingArr = new string[](listingNames.length);
-	bytes32 [] memory hashArr = new bytes32[](listingHashes.length);
-	bool [] memory whitelistedArr = new bool[](listingNames.length);
+        bytes32[] memory hashArr = new bytes32[](listingHashes.length);
+        bool[] memory whitelistedArr = new bool[](listingNames.length);
+        Listing memory templisting;
         for (uint256 i = 0; i < listingNames.length; i++) {
-            listingArr[i] = listingNames[i];
-	    hashArr[i] = listingHashes[i];
-	    Listing memory templisting = listings[listingHashes[i]];
-	    whitelistedArr[i] = templisting.whitelisted;
+            templisting = listings[listingHashes[i]];
+            listingArr[i] = strReview(templisting.data);
+	        hashArr[i] = listingHashes[i];
+            whitelistedArr[i] = templisting.whitelisted;
         }
         return (listingArr, hashArr, whitelistedArr);
     }
 
-    function getAllCourses() public view returns (string[] memory,uint[] memory, uint [] memory) {
+    function getAllCourses() public view returns (string[] memory,uint[] memory, uint[] memory) {
         string[] memory courseArr = new string[](courseNames.length);
-	uint[] memory coursetotalArr = new uint[](courseNames.length);
-	uint[] memory numberReviewsArr = new uint[] (courseNames.length);
+	    uint[] memory coursetotalArr = new uint[](courseNames.length);
+	    uint[] memory numberReviewsArr = new uint[] (courseNames.length);
 
         for (uint256 i = 0; i < courseNames.length; i++) {
             courseArr[i] = courseNames[i];
-	    Course memory temp_course = courses[courseNames[i]];
-	    coursetotalArr[i] = temp_course.courseTotal;
-	    numberReviewsArr[i] = temp_course.numberOfReviews;
+	        Course memory temp_course = courses[courseNames[i]];
+	        coursetotalArr[i] = temp_course.courseTotal;
+    	    numberReviewsArr[i] = temp_course.numberOfReviews;
         }
         return (courseArr, coursetotalArr, numberReviewsArr);
     }
@@ -201,9 +197,8 @@ contract Tcr {
     }
 
     function getCourseDetails(string memory _courseHash) public view returns (string memory, uint, uint){
-	
-	Course memory courseIns = courses[_courseHash];
-	return (courseIns.courseCode, courseIns.courseTotal.div(courseIns.numberOfReviews),courseIns.numberOfReviews);
+	    Course memory courseIns = courses[_courseHash];
+	    return (courseIns.courseCode, courseIns.courseTotal.div(courseIns.numberOfReviews),courseIns.numberOfReviews);
     }
 
     function CourseExists(string memory _courseHash) public view returns (uint) {
@@ -211,36 +206,33 @@ contract Tcr {
     }
 
     function createNewCourse(string memory _courseCode, uint _course_rating) private {
-	if (CourseExists(_courseCode) > 0){
-
-	Course storage temp_course = courses[_courseCode];
-	temp_course.numberOfReviews = temp_course.numberOfReviews + 1;
-	temp_course.courseTotal = (temp_course.courseTotal + _course_rating);
-			
-	}
-	else {
-		courses[_courseCode] = Course({
-		courseCode: _courseCode,
-		courseTotal : _course_rating,
-		numberOfReviews : 1,
-		arrIndex : courseNames.length
-	});
-	courseNames.push(_courseCode);
-	}
-	}	
+	    if (CourseExists(_courseCode) > 0){
+            Course storage temp_course = courses[_courseCode];
+            temp_course.numberOfReviews = temp_course.numberOfReviews + 1;
+            temp_course.courseTotal = (temp_course.courseTotal + _course_rating);
+        } else {
+            courses[_courseCode] = Course({
+                courseCode: _courseCode,
+                courseTotal : _course_rating,
+                numberOfReviews : 1,
+                arrIndex : courseNames.length
+            });
+    	    courseNames.push(_courseCode);
+	    }
+    }
 
     function createNewListing(bytes32 _listingHash, address sender, uint _amount,  string memory _roll, string memory _course, string memory _review, uint _rating) private  {
     	// Sets owner
         Listing storage listing = listings[_listingHash];
         listing.owner = sender;
         listing.data = Data({
-		rollNumber: _roll,
-		course: _course,
-		review: _review,
-		rating : _rating
-	});
-	
-	listingHashes.push(_listingHash);
+            rollNumber: _roll,
+            course: _course,
+            review: _review,
+            rating : _rating
+        });
+
+	    listingHashes.push(_listingHash);
         listingNames.push(strReview(listing.data));
         listing.arrIndex = listingNames.length - 1;
 
@@ -253,24 +245,22 @@ contract Tcr {
 
     // proposes a listing to be whitelisted
     function propose(uint _amount, string calldata _roll,  string calldata _course, string calldata _review, uint _rating ) external {
-	//change started
-	string memory source = string(abi.encodePacked(_roll, _course));
-	bytes32 _listingHash ;
+	    //change started
+	    string memory source = string(abi.encodePacked(_roll, _course));
+	    bytes32 _listingHash;
     	if (bytes(source).length == 0) {
-        _listingHash = 0x0;
+            _listingHash = 0x0;
     	}
-
     	assembly {
-        _listingHash := mload(add(source, 32))
+            _listingHash := mload(add(source, 32))
     	}
-	//change ended
-	
-	require(!isWhitelisted(_listingHash), "Listing is already whitelisted.");
+	    //change ended
+	    require(!isWhitelisted(_listingHash), "Listing is already whitelisted.");
         require(!appWasMade(_listingHash), "Listing is already in apply stage.");
         require(_amount >= minDeposit, "Not enough stake for application.");
-	
-	createNewListing(_listingHash, msg.sender, _amount,  _roll, _course, _review, _rating);
-	createNewCourse(_course, _rating);
+
+	    createNewListing(_listingHash, msg.sender, _amount,  _roll, _course, _review, _rating);
+	    createNewCourse(_course, _rating);
 
         // Transfer tokens from user
         require(token.transferFrom(msg.sender, address(this), _amount), "Token transfer failed.");
@@ -284,7 +274,7 @@ contract Tcr {
 
         // Listing must be in apply stage or already on the whitelist
         require(appWasMade(_listingHash) || listing.whitelisted, "Listing does not exist.");
-        
+
         // Prevent multiple challenges
         require(listing.challengeId == 0 || challenges[listing.challengeId].resolved, "Listing is already challenged.");
 
@@ -294,7 +284,7 @@ contract Tcr {
 
         // check if enough amount is staked for challenge
         require(_amount >= listing.deposit, "Not enough stake passed for challenge.");
-        
+
         pollNonce = pollNonce + 1;
         challenges[pollNonce] = Challenge({
             challenger: msg.sender,

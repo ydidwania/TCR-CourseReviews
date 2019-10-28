@@ -1,0 +1,1 @@
+ tok.transfer("0x9AeCa19490FE0b4FF3Bbd021c9e7929beDa4BA77", 50, { from: accounts[0] })
