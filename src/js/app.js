@@ -55,15 +55,7 @@ App = {
       console.log(accounts);
       App.account = accounts[0];
     })
-    // Load account data
-    // web3.eth.getCoinbase(function(err, account) {
-    //   console.log("Err", err);
-    //   if (err === null) {
-    //     App.account = account;
-    //     console.log("Accnr", account);
-    //     $("#accountAddress").html("Your Account: " + account);
-    //   }
-    // });
+    
     App.contracts.Token.deployed().then(function(instance) {
       App.tokenInstance = instance;
     });
@@ -74,12 +66,14 @@ App = {
       App.tcrInstance = instance;
       console.log(App.tcrInstance.address);
       // return App.tcrInstance.getListingDetails("0x3136443037303035354545343735000000000000000000000000000000000000");
-      return App.tcrInstance.getDetails();
+      // return App.tcrInstance.getDetails();
+      let listings = App.tcrInstance.getAllListings.call();
+      return listings;
       // return 10;
     }).then(function(minDeposit) {
       var candidatesResults = $("#candidatesResults");
       candidatesResults.empty();
-      console.log(minDeposit);
+      console.log(minDeposit[0]);
       // for (var i = 1; i <= candidatesCount; i++) {
       //   electionInstance.candidates(i).then(function(candidate) {
       //     var id = candidate[0];
@@ -104,7 +98,7 @@ App = {
     console.log(typeof(App.tcrInstance.address));
     console.log(App.account);
     App.tokenInstance.approve(App.tcrInstance.address, 10000, { from: App.account });
-    App.tcrInstance.propose(200, "16D070055", "EE475", "naice", 4);
+    App.tcrInstance.propose(200, "16D070022", "EE222", "nnopasce", 4);
 
 
   //   App.contracts.Tcr.deployed().then(function(instance) {
