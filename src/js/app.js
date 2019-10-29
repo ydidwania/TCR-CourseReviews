@@ -69,18 +69,53 @@ App = {
     // });
 
     // Load contract data
-    App.tcrInstance.methods.getAllListings().call().then(function (l) {
-      let listings = [];
-      for (let i = 0; i < l[0].length; i++) {
-        listings.push([l[0][i], l[1][i], l[2][i]]);
-      }
-      console.log(listings);
+    let courses = {};
+    // let listings = []];
 
+    
+    App.tcrInstance.methods.getAllListings().call().then(function (l) {
+      for (let i = 0; i < l[0].length; i++) {
+        let item = {};
+        let rev = l[0][i].split(' ');
+        item = {
+          'rollNo': rev[0],
+          'review': rev[2],
+          'rating': rev[3],
+          'listingHash': l[1][i],
+          'whitelisted' : l[2][i],             
+        } ;
+        if(courses[rev[1]]){
+          let avg = courses[rev[1]].avgRating;
+          let nR = courses[rev[1]].numRatings;
+          courses[rev[1]].avgRating = (avg*nR + parseFloat(rev[3]))/(nR +1);
+          courses[rev[1]].numRatings = nR +1;
+          courses[rev[1]].data.push(item);
+        }else{
+          courses[rev[1]] = {
+            'avgRating' : parseFloat(rev[3]),
+            'numRatings' : 1,
+            'data': [item],
+          };
+        }
+      }
+      console.log(courses);
+      var candidatesResults = $("#candidatesResults");
+      candidatesResults.empty();
+      // console.log(minDeposit[0]);
+      Object.keys(courses).forEach(function(key) {
+        let cTemplate = "<tr class=\"collapsible\"> <th>" + key + "</th><td>" + courses[key]['avgRating']+ "</td><td>" + courses[key]['numRatings'] + "</td></tr>"
+        let content = "<div class=\"content\">   <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p> </div>"
+        candidatesResults.append(cTemplate);
+        candidatesResults.append(content);
+        console.log(cTemplate);
+      });
+      loader.hide();
+      content.show();
     });
-    console.log("1");
-    console.log(App.account);
-    App.tokenInstance.methods.balanceOf("0x9AeCa19490FE0b4FF3Bbd021c9e7929beDa4BA77").call().then(console.log);
-    console.log("2");
+    // console.log("1");
+    // console.log(App.account);
+    // App.tokenInstance.methods.balanceOf("0x9AeCa19490FE0b4FF3Bbd021c9e7929beDa4BA77").call().then(console.log);
+    // console.log("2");
     // console.log(listings);
     // App.contracts.Tcr.options.data = {}
     // App.contracts.Tcr.deploy().then(function(instance) {
@@ -93,23 +128,19 @@ App = {
     //   return listings;
     //   // return 10;
     // }).then(function(minDeposit) {
-    //   var candidatesResults = $("#candidatesResults");
-    //   candidatesResults.empty();
-    //   console.log(minDeposit[0]);
-    //   // for (var i = 1; i <= candidatesCount; i++) {
-    //   //   electionInstance.candidates(i).then(function(candidate) {
-    //   //     var id = candidate[0];
-    //   //     var name = candidate[1];
-    //   //     var voteCount = candidate[2];
+      
+      // for (var course in courses) {
 
-    //   //     // Render candidate Result
-    //   //     var candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>"
-    //   //     candidatesResults.append(candidateTemplate);
-    //   //   });
-    //   // }
+      //   electionInstance.candidates(i).then(function(candidate) {
+      //     var id = candidate[0];
+      //     var name = candidate[1];
+      //     var voteCount = candidate[2];
 
-    //   loader.hide();
-    //   content.show();
+      //     // Render candidate Result
+      //     var candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>"
+      //     candidatesResults.append(candidateTemplate);
+      //   });
+      // }
     // }).catch(function(error) {
     //   console.warn(error);
     // });

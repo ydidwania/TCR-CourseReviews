@@ -4,3 +4,13 @@
  web3.eth.sendTransaction({from:accounts[0], to :'0x9AeCa19490FE0b4FF3Bbd021c9e7929beDa4BA77', value:a});
  tok.transfer("0x9AeCa19490FE0b4FF3Bbd021c9e7929beDa4BA77", 10000000, { from: acco
 unts[0] })
+
+(2) […]
+​
+0: Array(3) [ "613241 EE465 Hellsf 3", "0x3631333234314545343635000000000000000000000000000000000000000000", false ]
+​
+1: Array(3) [ "24623 EE333 dvdvjn 1", "0x3234363233454533333300000000000000000000000000000000000000000000", false ]
+​
+length: 2
+​
+<prototype>: Array []
