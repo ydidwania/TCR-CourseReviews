@@ -29,6 +29,7 @@ App = {
   web3: {},
   contracts: {},
   account: '0x0',
+  courses: {},
   tokenInstance: {},
   tcrInstance: {},
 
@@ -59,16 +60,27 @@ App = {
       // Connect provider to interact with contract
       App.tcrInstance.setProvider(App.web3Provider);
       //App.listenForEvents();
-
-
     }).then(function () {
       $.getJSON("Token.json", function (token) {
         let abi = token.abi;
         App.tokenInstance = new App.web3.eth.Contract(abi, "0x1baFDfC807e402Ca92993b874B83b5Ce49e571c7");
         // Connect provider to interact with contract
         App.tokenInstance.setProvider(App.web3Provider);
-        return App.render();
+        
+        return App.initMetamask();
       });
+    });
+  },
+
+  initMetamask: function(){
+    var ethereum = window.ethereum;
+    ethereum.enable().then(function (accounts) {
+      console.log(accounts);
+      App.account = accounts[0];
+      console.log("Assigned - ",App.account);
+      App.tcrInstance.options.from = App.account;
+      App.tokenInstance.options.from = App.account;
+      return App.render();
     });
   },
 
@@ -79,23 +91,10 @@ App = {
 
     loader.show();
     content.hide();
-    var ethereum = window.ethereum;
-    ethereum.enable().then(function (accounts) {
-      console.log(accounts);
-      App.account = accounts[0];
-      console.log("Assigned - ",App.account);
-      App.tcrInstance.options.from = App.account;
-      App.tokenInstance.options.from = App.account;
-    });
-
-    // App.contracts.Token.deployed().then(function(instance) {
-    //   App.tokenInstance = instance;
-    // });
 
     // Load contract data
     let courses = {};
     // let listings = []];
-
     
     App.tcrInstance.methods.getAllListings().call().then(function (l) {
       for (let i = 0; i < l[0].length; i++) {
@@ -123,6 +122,7 @@ App = {
         }
       }
       console.log(courses);
+      App.courses = courses;
       var reviewList = $(".collapsible");
       reviewList.empty();
       // console.log(minDeposit[0]);
@@ -144,19 +144,14 @@ App = {
       });
 
     });
-    // console.log("1");
-    // console.log(App.account);
-    // App.tokenInstance.methods.balanceOf("0x9AeCa19490FE0b4FF3Bbd021c9e7929beDa4BA77").call().then(console.log);
-    // console.log("2");
-    // console.log(listings);
-    // App.contracts.Tcr.options.data = {}
-    // App.contracts.Tcr.deploy().then(function(instance) {
-    //   console.log("Hello");
-    //   App.tcrInstance = instance;
-    //   console.log(App.tcrInstance.address);
-    // }).catch(function(error) {
-    //   console.warn(error);
-    // });
+
+  //   const filter = web3.eth.filter({
+  //     address: App.tcrInstance.options.address,
+  //   });
+  //   filter.watch((error, result) => {
+  //     console.log("Result", result);
+  //  })
+    
   },
 
   propose: async function () {
