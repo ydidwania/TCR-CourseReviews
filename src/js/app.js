@@ -28,8 +28,9 @@ App = {
   web3Provider: null,
   web3: {},
   contracts: {},
-  account: '0x0',
   courses: {},
+  challenges: {},
+  account: '0x0',
   tokenInstance: {},
   tcrInstance: {},
 
@@ -80,10 +81,36 @@ App = {
       console.log("Assigned - ",App.account);
       App.tcrInstance.options.from = App.account;
       App.tokenInstance.options.from = App.account;
-      return App.render();
+      return App.readHistory();
     });
   },
 
+  readHistory: function(){
+
+    App.tcrInstance.getPastEvents('_Challenge',{fromBlock: 0,
+      toBlock: 'latest'}, function(er,ev){
+        ev.forEach(function(event){
+          let lHash = event.returnValues[0];
+          let cId = event.returnValues[1];
+          App.challenges[lHash] = cId;
+        }); 
+      // use App.challenged to Display that the listing is under a poll 
+    });
+    
+    App.tcrInstance.getPastEvents('_ResolveChallenge',{fromBlock: 0,
+      toBlock: 'latest'}, function(er,ev){
+        ev.forEach(function(event){
+          let lHash = event.returnValues[0];
+          delete App.challenges[lHash];
+        });
+      // if c_id does not exist in App.challenges then it is either resolved 
+      // or never created.
+    });
+    //Hack below
+    console.log("Reading History");
+    setTimeout(App.render(),5000);// wait for 5s
+  },
+  
   render: function () {
     // var tcrInstance;
     var loader = $("#loader");
