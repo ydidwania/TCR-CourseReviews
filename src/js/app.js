@@ -3,7 +3,25 @@
 
 
 let oneReviewDiv = function({roll, review, rating, lHash, wl}){
-  return(`<div> <ul class=\"horiList\"> <li>${roll}</li> <li>${review}</li> <li>${rating}</li> <li>${lHash}</li> <li>${wl}</li> </ul></div>`)
+  return(
+    `<div class="row hoverable">
+        <div class="col s2">${roll}</div>
+        <div class="col s4">${review}</div>
+        <div class="col s1">${rating}</div>
+        <div class="col s1">${wl}</div>
+        <div class="col s4">${lHash}</div>
+    </div>`
+  );
+}
+
+let getCHeader = function(a,b,c){
+  return (
+    `<div class="collapsible-header row">
+                        <div class="col s4">${a}</div>
+                        <div class="col s4">${b}</div>
+                        <div class="col s4">${c}</div>
+                      </div>`
+  );
 }
 
 App = {
@@ -105,41 +123,26 @@ App = {
         }
       }
       console.log(courses);
-      var candidatesResults = $("#candidatesResults");
-      candidatesResults.empty();
+      var reviewList = $(".collapsible");
+      reviewList.empty();
       // console.log(minDeposit[0]);
       Object.keys(courses).forEach(function(key) {
-        let cTemplate = "<tr class=\"collapsible\"> <th>" + key + "</th><td>" + courses[key]['avgRating']+ "</td><td>" + courses[key]['numRatings'] + "</td></tr>";
+        let cHeader = getCHeader(key, courses[key].avgRating, courses[key].numRatings);
         let reviewDivs = [];
         courses[key].data.forEach(function(item){
             reviewDivs.push(oneReviewDiv(item))
         });
         
-        let content = "<div class=\"content\">" + reviewDivs.join()+"</div>"
-        candidatesResults.append(cTemplate);
-        candidatesResults.append(content);
-        console.log(cTemplate);
+        let cBody = "<div class=\"collapsible-body\">" + reviewDivs.join()+"</div>"
+        reviewList.append(`<li>${cHeader}${cBody}</li>`);
       });
       loader.hide();
       content.show();
-      var coll = document.getElementsByClassName("collapsible");
-      console.log(coll);
-      var i;
       
-      for (i = 0; i < coll.length; i++) {
+      $(document).ready(function(){
+        $('.collapsible').collapsible();
+      });
 
-        coll[i].addEventListener("click", function() {
-          this.classList.toggle("active");
-          var content = this.nextElementSibling;
-          console.error("content ye hai",content);
-          if (content.style.maxHeight){
-            content.style.maxHeight = null;
-          } else {
-            // content.style.maxHeight = content.scrollHeight + "px";
-            content.style.maxHeight = "100px";
-          } 
-        });
-      }
     });
     // console.log("1");
     // console.log(App.account);
