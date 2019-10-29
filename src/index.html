@@ -11,7 +11,7 @@
     <style>
       .collapsible {
         background-color: #777;
-        color: white;
+        color: black;
         cursor: pointer;
         padding: 18px;
         width: 100%;
@@ -43,6 +43,18 @@
         overflow: hidden;
         transition: max-height 0.2s ease-out;
         background-color: #f1f1f1;
+      }
+      .horiList {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        display: table;
+      }
+
+      .horiList li{
+        display: table-cell;
+        text-align: center;
+        border: 1px solid #000;
       }
       </style>      
   </head>
@@ -105,22 +117,24 @@
     <!-- <script src="js/truffle-contract.js"></script> -->
     <script src="js/app.js"></script>
     <script>
-      var coll = document.getElementsByClassName("collapsible");
-      console.log(coll);
-      var i;
+      // var coll = document.getElementsByClassName("collapsible");
+      // console.log(coll);
+      // var i;
       
-      for (i = 0; i < coll.length; i++) {
-        coll[i].addEventListener("click", function() {
-          this.classList.toggle("active");
-          var content = this.nextElementSibling;
-          console.log("content ye hai",content);
-          if (content.style.maxHeight){
-            content.style.maxHeight = null;
-          } else {
-            content.style.maxHeight = content.scrollHeight + "px";
-          } 
-        });
-      }
+      // for (i = 0; i < coll.length; i++) {
+
+      //   coll[i].addEventListener("click", function() {
+      //     this.classList.toggle("active");
+      //     var content = this.nextElementSibling;
+      //     console.error("content ye hai",content);
+      //     if (content.style.maxHeight){
+      //       content.style.maxHeight = null;
+      //     } else {
+      //       // content.style.maxHeight = content.scrollHeight + "px";
+      //       content.style.maxHeight = "100px";
+      //     } 
+      //   });
+      // }
       </script>
       
 

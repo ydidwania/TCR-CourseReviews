@@ -1,5 +1,11 @@
 // import Web3 from  '../../node_modules/web3/src/index.js';
 // let TruffleContract = require('truffle-contract');
+
+
+let oneReviewDiv = function({roll, review, rating, lHash, wl}){
+  return(`<div> <ul class=\"horiList\"> <li>${roll}</li> <li>${review}</li> <li>${rating}</li> <li>${lHash}</li> <li>${wl}</li> </ul></div>`)
+}
+
 App = {
   web3Provider: null,
   web3: {},
@@ -78,11 +84,11 @@ App = {
         let item = {};
         let rev = l[0][i].split(' ');
         item = {
-          'rollNo': rev[0],
+          'roll': rev[0],
           'review': rev[2],
           'rating': rev[3],
-          'listingHash': l[1][i],
-          'whitelisted' : l[2][i],             
+          'lHash': l[1][i],
+          'wl' : l[2][i],             
         } ;
         if(courses[rev[1]]){
           let avg = courses[rev[1]].avgRating;
@@ -103,14 +109,37 @@ App = {
       candidatesResults.empty();
       // console.log(minDeposit[0]);
       Object.keys(courses).forEach(function(key) {
-        let cTemplate = "<tr class=\"collapsible\"> <th>" + key + "</th><td>" + courses[key]['avgRating']+ "</td><td>" + courses[key]['numRatings'] + "</td></tr>"
-        let content = "<div class=\"content\">   <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p> </div>"
+        let cTemplate = "<tr class=\"collapsible\"> <th>" + key + "</th><td>" + courses[key]['avgRating']+ "</td><td>" + courses[key]['numRatings'] + "</td></tr>";
+        let reviewDivs = [];
+        courses[key].data.forEach(function(item){
+            reviewDivs.push(oneReviewDiv(item))
+        });
+        
+        let content = "<div class=\"content\">" + reviewDivs.join()+"</div>"
         candidatesResults.append(cTemplate);
         candidatesResults.append(content);
         console.log(cTemplate);
       });
       loader.hide();
       content.show();
+      var coll = document.getElementsByClassName("collapsible");
+      console.log(coll);
+      var i;
+      
+      for (i = 0; i < coll.length; i++) {
+
+        coll[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          console.error("content ye hai",content);
+          if (content.style.maxHeight){
+            content.style.maxHeight = null;
+          } else {
+            // content.style.maxHeight = content.scrollHeight + "px";
+            content.style.maxHeight = "100px";
+          } 
+        });
+      }
     });
     // console.log("1");
     // console.log(App.account);
@@ -122,25 +151,6 @@ App = {
     //   console.log("Hello");
     //   App.tcrInstance = instance;
     //   console.log(App.tcrInstance.address);
-    //   // return App.tcrInstance.getListingDetails("0x3136443037303035354545343735000000000000000000000000000000000000");
-    //   // return App.tcrInstance.getDetails();
-    //   let listings = App.tcrInstance.getAllListings.call();
-    //   return listings;
-    //   // return 10;
-    // }).then(function(minDeposit) {
-      
-      // for (var course in courses) {
-
-      //   electionInstance.candidates(i).then(function(candidate) {
-      //     var id = candidate[0];
-      //     var name = candidate[1];
-      //     var voteCount = candidate[2];
-
-      //     // Render candidate Result
-      //     var candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>"
-      //     candidatesResults.append(candidateTemplate);
-      //   });
-      // }
     // }).catch(function(error) {
     //   console.warn(error);
     // });
@@ -186,7 +196,7 @@ App = {
     console.log(amount);
     App.tcrInstance.methods.vote(hash, amount, choice);
 
-  }
+  },
 
   /*,
   listenForEvents: function() {
@@ -242,6 +252,7 @@ App = {
         });
 
   }*/
+
 };
 
 $(function () {
