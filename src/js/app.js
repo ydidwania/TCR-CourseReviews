@@ -6,34 +6,38 @@ let oneReviewDiv = function({roll, review, rating, lHash, wl}){
   let icon;
   let reload;
   if (wl){
-    icon = "<i class=\"material-icons\ green-text\">verified_user</i>"
+    icon = `<i title=\"Whitelisted\" class=\"material-icons\ green-text\">verified_user</i>`;
     reload = ``;
   } else if(App.challenges[lHash]){ // challenge going on
-    icon = "<i class=\"material-icons\ red-text\">thumbs_up_down</i>"
+    let cId = App.challenges[lHash];
+    icon = `<i data-tooltip=\"Copy Challenge Id\" class=\"material-icons red-text tooltipped \" onClick=\"App.copy_content(\'${cId}\')\">thumbs_up_down</i>`;
     reload = `<div class="col s1" onClick=\"App.updateStatus(\'${lHash}\')\"><i class="material-icons black-text">refresh</i></div>`;
   } else{
-    icon = "<i class=\"material-icons\ yellow-text\">watch_later</i>"
+    icon = "<i title=\"Under Review\" class=\"material-icons\ yellow-text\">watch_later</i>"
     reload = `<div class="col s1" onClick=\"App.updateStatus(\'${lHash}\')\"><i class="material-icons black-text">refresh</i></div>`;
   }
 
   return(
-    `<div class="row hoverable">`
+    `<div class="row">`
     +  reload
     +  `<div class="col s5">${review}</div>
         <div class="col s2">${rating} <i class="material-icons orange-text">star</i> </div>
         <div class="col s1">${icon}</div>
-        <div class="col s3 tooltipped truncate copy_content" data-position="bottom" data-tooltip="Click to Copy">${lHash}</div>
+        <div class="col s3 tooltipped truncate copy_content"  data-tooltip="Click to Copy">
+        ${lHash}</div>
+        <div class="col s1 tooltipped" data-tooltip="Copy to Clipboard"><a class="btn" onClick="App.copy_content(\'${lHash}\')"><i class="material-icons">content_copy</i><p class="copy_content hide">${lHash}</p></a></div>
+        
     </div>`
   );
 }
 
 let getCHeader = function(a,b,c){
   return (
-    `<div class="collapsible-header row">
+    `<strong><div class="collapsible-header row collection">
                         <div class="col s4">${a}</div>
-                        <div class="col s4">${b}</div>
+                        <div class="col s4">${b}<i class="material-icons orange-text">star</i></div>
                         <div class="col s4">${c}</div>
-                      </div>`
+                      </div></strong>`
   );
 }
 
@@ -105,6 +109,7 @@ App = {
     App.tcrInstance.getPastEvents('_Challenge',{fromBlock: 0,
       toBlock: 'latest'}, function(er,ev){
         ev.forEach(function(event){
+          console.log("History:Challenge Event", event);
           let lHash = event.returnValues[0];
           let cId = event.returnValues[1];
           App.challenges[lHash] = cId;
@@ -115,6 +120,7 @@ App = {
     App.tcrInstance.getPastEvents('_ResolveChallenge',{fromBlock: 0,
       toBlock: 'latest'}, function(er,ev){
         ev.forEach(function(event){
+          console.log("History:ResolveChallenge Event", event);
           let lHash = event.returnValues[0];
           delete App.challenges[lHash];
         });
@@ -171,7 +177,7 @@ App = {
       }
       console.log(courses);
       App.courses = courses;
-      var reviewList = $(".collapsible");
+      var reviewList = $(".courseReviewList");
       reviewList.empty();
       // console.log(minDeposit[0]);
       Object.keys(courses).forEach(function(key) {
@@ -180,8 +186,12 @@ App = {
         courses[key].data.forEach(function(item){
             reviewDivs.push(oneReviewDiv(item))
         });
-        
-        let cBody = "<div class=\"collapsible-body\">" + reviewDivs.join(' ')+"</div>"
+        let cBody = [];
+        reviewDivs.forEach(function(rd){
+          cBody.push("<div class=\"collapsible-body\">" + rd +"</div>");
+        });
+        cBody = cBody.join(' ');
+        // let cBody = "<div class=\"collapsible-body\">" + reviewDivs.join(' ')+"</div>";
         reviewList.append(`<li>${cHeader}${cBody}</li>`);
       });
       loader.hide();
@@ -191,7 +201,7 @@ App = {
         $('.collapsible').collapsible();
         $('.tooltipped').tooltip();
         $('.copy_content').click(function(e){
-          var $temp = $("<input>");
+          let $temp = $("<input>");
           $temp.val(e.target.innerText);
           // var $temp = e.target;
           // $("body").append($temp);
@@ -199,18 +209,23 @@ App = {
           document.body.appendChild($temp[0]);
           $temp[0].select();
           document.execCommand("copy");
+          document.body.removeChild($temp[0]);
         });
       });
 
     });
+  },
 
-  //   const filter = web3.eth.filter({
-  //     address: App.tcrInstance.options.address,
-  //   });
-  //   filter.watch((error, result) => {
-  //     console.log("Result", result);
-  //  })
-    
+  copy_content: function(text){
+    let $temp = $("<input>");
+    $temp.val(text);
+    // var $temp = e.target;
+    // $("body").append($temp);
+    console.log($temp[0]);
+    document.body.appendChild($temp[0]);
+    $temp[0].select();
+    document.execCommand("copy");
+    document.body.removeChild($temp[0]);
   },
 
   propose: async function () {
@@ -328,20 +343,8 @@ App = {
   },
 
   updateStatus: function(lHash){
-    console.log("Updating Status");
-    // let lHashList = [];
-    // Object.keys(App.courses).forEach((key)=>{
-    //   App.courses[key].data.forEach((item)=>{
-    //     App.tcrInstance.methods.updateStatus(item['lHash']).send();
-    //     // lHashList.push(item['lHash']);
-    //   });
-    // });
-    console.log(typeof(lHash));
-    console.log(lHash);
-    
-    // var $temp = lHash;
-    App.tcrInstance.methods.updateStatus(lHash).send();
-    App.render();
+    console.log("Updating Status of ", lHash);
+    App.tcrInstance.methods.updateStatus(lHash).send(function(r){App.render();});
   }
 };
 
