@@ -47,27 +47,146 @@
         </div>
       </div>
     </div>
-     
+ 
+    <div class="row">
+      <form class="col s12">
+        <div class="row">
+          <div class="input-field col s6">
+            <input  id="amount" type="number" class="validate">
+            <label for="amount">Amount</label>
+          </div>
+          <div class="input-field col s6">
+            <input id="roll" type="text" class="validate">
+            <label for="roll">Roll number</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input  id="course" type="text" class="validate">
+            <label for="course">Course Code</label>
+          </div>
+          <div class="input-field col s6">
+            <input id="rating" type="number" max="5" min = "0" class="validate">
+            <label for="rating">Rating</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <input  id="review" type="text" class="validate">
+            <label for="review">Review</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <center>
       <button onclick="App.propose()">Propose</button>
-      Amount: <input type="number" id="amount" />
-      Roll: <input type="text" id="roll" />
-      Course_code: <input type="text" id="course" />
-      Review: <input type="text" id="review" />
-      Rating: <input type="number" id="rating" />
+    </center>
 
+        <br/>
+        <br/>
+
+    <div class="row">
+      <form class="col s12">
+        <div class="row">
+          <div class="input-field col s6">
+            <input  id="hash" type="text" class="validate">
+            <label for="hash">Listing hash</label>
+          </div>
+          <div class="input-field col s6">
+            <input id="challenge_amount" type="number" class="validate">
+            <label for="challenge_amount">Amount</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <center>
       <button onclick="App.challenge()">Challenge</button>
-      ChallengeHash: <input type="text" id="hash" />
-      ChallengeAmount: <input type="number" id="challenge_amount" />
+    </center>
+      
+    <br/>
+    <br/>
 
+    <div class="row">
+      <form class="col s12">
+        <div class="row">
+          <div class="input-field col s6">
+            <input  id="VoteHash" type="text" class="validate">
+            <label for="VoteHash">Listing hash</label>
+          </div>
+          <div class="input-field col s6">
+            <input id="VoteAmount" type="number" class="validate">
+            <label for="VoteAmount">Amount</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <input  id="Vote" type="number" max="1" min = "0"class="validate">
+            <label for="Vote">Vote</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <center>
       <button onclick="App.vote()">Vote</button>
-      VoteHash: <input type="text" id="VoteHash" />
-      VoteAmount: <input type="number" id="VoteAmount" />
-      Vote: <input type="number" id="Vote" />
-      
-      
-      <hr />
-    </form>
+    </center>
+
+    <br/>
+    <br/>
+
     
+    <div class="row">
+      <form class="col s12">
+        <div class="row">
+          <div class="input-field col s6">
+            <input  id="ClaimHash" type="text" class="validate">
+            <label for="ClaimHash">Listing Hash</label>
+          </div>
+          <div class="input-field col s6">
+            <input id="ChallengeID" type="number" class="validate">
+            <label for="ChallengeID">ChallengeID</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <center>
+      <button onclick="App.Claim()">Claim Rewards</button>
+    </center>
+    <!-- 
+    Amount: <input type="number" id="amount" />
+    Roll: <input type="text" id="roll" />
+    <br/>
+    Course_code: <input type="text" id="course" />
+    Review: <input type="text" id="review" />
+    <br/>
+    Rating: <input type="number" id="rating" />
+    <button onclick="App.propose()">Propose</button>
+
+    <br/>
+    <br/>
+    <br/>
+    ChallengeHash: <input type="text" id="hash" />
+    ChallengeAmount: <input type="number" id="challenge_amount" />
+    <br/>
+    <button onclick="App.challenge()">Challenge</button>
+    <br/>
+    <br/>
+    <br/>
+
+    VoteHash: <input type="text" id="VoteHash" />
+    VoteAmount: <input type="number" id="VoteAmount" />
+    <br/>
+    Vote: <input type="number" id="Vote" />
+    <button onclick="App.vote()">Vote</button>
+    <br/>
+    <br/>
+    <br/>
+
+    Listing Hash: <input type="text" id="ClaimHash" />
+    Challenge ID: <input type="number" id="ChallengeID" />
+    <button onclick="App.Claim()">ClaimRewards</button>   
+    <hr />
+    </form>
+     -->
     
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -79,11 +198,5 @@
     <!-- <script src="js/truffle-contract.js"></script> -->
     <!-- Compiled and minified JavaScript -->
     <script src="js/app.js"></script>
-    <script>
-    $(document).ready(function(){
-    $('.collapsible').collapsible();
-  });
-  </script>
-    
   </body>
 </html>

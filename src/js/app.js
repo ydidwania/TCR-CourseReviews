@@ -4,21 +4,25 @@
 
 let oneReviewDiv = function({roll, review, rating, lHash, wl}){
   let icon;
+  let reload;
   if (wl){
     icon = "<i class=\"material-icons\ green-text\">verified_user</i>"
+    reload = ``;
   } else if(App.challenges[lHash]){ // challenge going on
     icon = "<i class=\"material-icons\ red-text\">thumbs_up_down</i>"
+    reload = `<div class="col s1" onClick=\"App.updateStatus(\'${lHash}\')\"><i class="material-icons black-text">refresh</i></div>`;
   } else{
     icon = "<i class=\"material-icons\ yellow-text\">watch_later</i>"
+    reload = `<div class="col s1" onClick=\"App.updateStatus(\'${lHash}\')\"><i class="material-icons black-text">refresh</i></div>`;
   }
 
   return(
-    `<div class="row hoverable">
-        <div class="col s2">${roll}</div>
-        <div class="col s4">${review}</div>
-        <div class="col s1">${rating}<i class=\"material-icons yellow-text\">star</i>"</div>
+    `<div class="row hoverable">`
+    +  reload
+    +  `<div class="col s5">${review}</div>
+        <div class="col s2">${rating} <i class="material-icons orange-text">star</i> </div>
         <div class="col s1">${icon}</div>
-        <div class="col s3 tooltipped data-position=\"bottom\" data-tooltip=\"Click to Copy\" truncate copy_content">${lHash}</div>
+        <div class="col s3 tooltipped truncate copy_content" data-position="bottom" data-tooltip="Click to Copy">${lHash}</div>
     </div>`
   );
 }
@@ -65,15 +69,13 @@ App = {
     $.getJSON("Tcr.json", function (tcr) {
       // Instantiate a new truffle contract from the artifact
       let abi = tcr.abi;
-      console.log(App.web3);
-      App.tcrInstance = new App.web3.eth.Contract(abi, "0xa570D419ce5d72464fEb4058cdc6D045E5768588");
+      App.tcrInstance = new App.web3.eth.Contract(abi, "0x2660c458C6f90d2EbA26A478c0e90d329075a0E2");
       // Connect provider to interact with contract
       App.tcrInstance.setProvider(App.web3Provider);
-      //App.listenForEvents();
     }).then(function () {
       $.getJSON("Token.json", function (token) {
         let abi = token.abi;
-        App.tokenInstance = new App.web3.eth.Contract(abi, "0xa881f356F852B5907456c61B81F4F325A7f602Df");
+        App.tokenInstance = new App.web3.eth.Contract(abi, "0x1baFDfC807e402Ca92993b874B83b5Ce49e571c7");
         // Connect provider to interact with contract
         App.tokenInstance.setProvider(App.web3Provider);
         
@@ -85,17 +87,21 @@ App = {
   initMetamask: function(){
     var ethereum = window.ethereum;
     ethereum.enable().then(function (accounts) {
-      console.log(accounts);
       App.account = accounts[0];
-      console.log("Assigned - ",App.account);
       App.tcrInstance.options.from = App.account;
       App.tokenInstance.options.from = App.account;
+
+      App.tcrInstance.methods.getDetails().call().then(function (details) {
+        let appLen = parseInt(details[3]);
+        console.log("Hello");
+        // setInterval(App.updateStatus  , appLen*1000);
+      });
+
       return App.readHistory();
     });
   },
 
   readHistory: function(){
-
     App.tcrInstance.getPastEvents('_Challenge',{fromBlock: 0,
       toBlock: 'latest'}, function(er,ev){
         ev.forEach(function(event){
@@ -118,6 +124,7 @@ App = {
     //Hack below
     console.log("Reading History");
     setTimeout(App.render(),5000);// wait for 5s
+    App.listenForEvents();
   },
   
   render: function () {
@@ -140,7 +147,7 @@ App = {
       }
       for (let i = 0; i < l[0].length; i++) {
         let item = {};
-        let rev = l[0][i].split(' ');
+        let rev = l[0][i].split('|');
         item = {
           'roll': rev[0],
           'review': rev[2],
@@ -216,90 +223,123 @@ App = {
 
     App.tokenInstance.methods.approve(App.tcrInstance.options.address, 10000)
     .send(function(r){
-      App.tcrInstance.methods.propose(amount, roll, course_code, review, rating).send(console.log);
+    App.tcrInstance.methods.propose(amount, roll, course_code, review, rating).send(console.log)
+    .on('error',function(error){alert("Failed")})
     });  
-    
-
   },
 
-  challenge: function () {
-    App.tokenInstance.approve(App.tcrInstance.address, 10000, { from: App.account });
-
+  challenge: async function () {
     let hash = $('#hash').val();
     let amount = $('#challenge_amount').val();
-
-    console.log(amount);
-    App.tcrInstance.methods.challenge(hash, amount);
-
+    App.tokenInstance.methods.approve(App.tcrInstance.options.address, 10000)
+    .send(function(r){
+    App.tcrInstance.methods.challenge(hash, amount).send(console.log)
+    .on('error',function(error){alert("Failed")})
+    });
   },
 
-  vote: function () {
-    App.tokenInstance.approve(App.tcrInstance.address, 10000, { from: App.account });
-
+  vote: async function () {
     let hash = $('#VoteHash').val();
     let amount = $('#VoteAmount').val();
     let choice = $('#Vote').val();
-
-    console.log(amount);
-    App.tcrInstance.methods.vote(hash, amount, choice);
-
+    App.tokenInstance.methods.approve(App.tcrInstance.options.address, 10000)
+    .send(function(r){
+    App.tcrInstance.methods.vote(hash, amount, choice).send(console.log)
+    .on('error',function(error){alert("Failed")})
+    });
   },
 
-  /*,
-  listenForEvents: function() {
+  // Claim has to done by you. This is not correct
+  Claim: async function () {
+    let hash = $('#ClaimHash').val();
+    let id = $('#ChallengeID').val();
+    App.tcrInstance.methods.updateStatus(hash).send(function(r){
+    App.tcrInstance.methods.claimRewards(id).send()
+    .on('error',function(error){alert("Failed")})} )
+    .on('error',function(error){alert("Failed")});
+  },
 
-        instance._Application({}, {
-          fromBlock: 0,
-          toBlock: 'latest'
-        }).watch(function(error, event) {
-          console.log("New application", event)
-          //alert("I am an alert box!");
-          // Reload when a new vote is recorded
+  listenForEvents: async function() {
+    var latestBlock;
+    App.web3.eth.getBlockNumber()
+    .then(function(b){
+      latestBlock = b;
+    });
+    // web3.eth.getBlock("latest").then(console.log); //get the latest blocknumber
+    // latestBlock = latestBlock.number;
+    // console.log("Latest - ",latestBlock);
+    App.tcrInstance.events._Application({fromBlock: 'latest'}, (error, event) => { 
+      if (error) {
+        console.log(error); return; 
+      } else {
+        if(event.blockNumber != latestBlock) {   //accept only new events
+          // alert("I am app");
+          latestBlock = latestBlock + 1;   //update the latest blockNumber
           App.render();
-        });
+        }
+      }
+    });
 
-        instance._Challenge({}, {
-          fromBlock: 0,
-          toBlock: 'latest'
-        }).watch(function(error, event) {
-          console.log("New challenge", event)
-          //alert("I am an alert box!");
-          // Reload when a new vote is recorded
+    App.tcrInstance.events._Challenge({fromBlock: 'latest'}, (error, event) => { 
+      if (error) {
+        console.log(error); return; 
+      } else {
+        if(event.blockNumber != latestBlock) {   //accept only new events
+          // alert("I am app");
+          let lHash = event.returnValues[0];
+          let cId = event.returnValues[1];
+          App.challenges[lHash] = cId;
+          latestBlock = latestBlock + 1;   //update the latest blockNumber
           App.render();
-        });
+        }
+      }
+    });
 
-        instance._Vote({}, {
-          fromBlock: 0,
-          toBlock: 'latest'
-        }).watch(function(error, event) {
-          console.log("New vote", event)
-          //alert("I am an alert box!");
-          // Reload when a new vote is recorded
+    App.tcrInstance.events._Vote({fromBlock: 'latest'}, (error, event) => { 
+      if (error) {
+        console.log(error); return; 
+      } else {
+        if(event.blockNumber != latestBlock) {   //accept only new events
+          let lHash = event.returnValues[0];
+          let cId = event.returnValues[1];
+          alert("Voted ", cId, lHash);
+          latestBlock = latestBlock + 1;   //update the latest blockNumber
+        }
+      }
+    });
+
+    App.tcrInstance.events._ResolveChallenge({fromBlock: 'latest'}, (error, event) => { 
+      if (error) {
+        console.log(error); return; 
+      } else {
+        if(event.blockNumber != latestBlock) {   //accept only new events
+          let lHash = event.returnValues[0];
+          if(App.challenges[lHash])
+            delete App.challenges[lHash];
+          alert("Resolve Challenge ", lHash);
+          latestBlock = latestBlock + 1;   //update the latest blockNumber
           App.render();
-        });
+        }
+      }
+    }); 
+  },
 
-        instance._ResolveChallenge({}, {
-          fromBlock: 0,
-          toBlock: 'latest'
-        }).watch(function(error, event) {
-          console.log("New challenge", event)
-          //alert("I am an alert box!");
-          // Reload when a new vote is recorded
-          App.render();
-        });
-
-        instance._RewardClaimed({}, {
-          fromBlock: 0,
-          toBlock: 'latest'
-        }).watch(function(error, event) {
-          console.log("New challenge", event)
-          //alert("I am an alert box!");
-          // Reload when a new vote is recorded
-          App.render();
-        });
-
-  }*/
-
+  updateStatus: function(lHash){
+    console.log("Updating Status");
+    // let lHashList = [];
+    // Object.keys(App.courses).forEach((key)=>{
+    //   App.courses[key].data.forEach((item)=>{
+    //     App.tcrInstance.methods.updateStatus(item['lHash']).send();
+    //     // lHashList.push(item['lHash']);
+    //   });
+    // });
+    console.log(typeof(lHash));
+    console.log(lHash);
+    
+    // var $temp = lHash;
+    App.tcrInstance.methods.updateStatus(lHash).send();
+    App.render();
+  }
 };
 
 $(function () {
