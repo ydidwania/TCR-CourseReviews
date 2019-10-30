@@ -54,92 +54,108 @@
     </div>
  
     <div class="row">
-      <form class="col s12">
-        <div class="row">
-          <div class="input-field col s6">
-            <input  id="amount" type="number" class="validate">
-            <label for="amount">Amount</label>
+      <div class="center-align col s4">
+        <form>
+          <div class="row">
+            <div class="input-field col s6">
+              <input  id="amount" type="number" class="validate">
+              <label for="amount">Amount</label>
+            </div>
+            <div class="input-field col s6">
+              <input id="roll" type="text" class="validate">
+              <label for="roll">Roll number</label>
+            </div>
           </div>
-          <div class="input-field col s6">
-            <input id="roll" type="text" class="validate">
-            <label for="roll">Roll number</label>
+          <div class="row">
+            <div class="input-field col s6">
+              <input  id="course" type="text" class="validate">
+              <label for="course">Course Code</label>
+            </div>
+            <div class="input-field col s6">
+              <input id="rating" type="number" max="5" min = "0" class="validate">
+              <label for="rating">Rating</label>
+            </div>
           </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <input  id="review" type="text" class="validate">
+              <label for="review">Review</label>
+            </div>
+          </div>
+        </form>
+
+        <button class="btn waves-effect waves-light" onclick="App.propose()">Propose
+          <i class="material-icons right">send</i>
+        </button>
+                
+
+        <!-- <button onclick="App.propose()">Propose</button> -->
+      </div>
+
+      <div class="center-align col s4">
+        <div>
+          <form class="col s12">
+            <div class="row">
+              <div class="input-field col s6">
+                <input  id="hash" type="text" class="validate">
+                <label for="hash">Listing hash</label>
+              </div>
+              <div class="input-field col s6">
+                <input id="challenge_amount" type="number" class="validate">
+                <label for="challenge_amount">Amount</label>
+              </div>
+            </div>
+          </form>
+          <button class="btn waves-effect waves-light" onclick="App.challenge()">Challenge
+              <i class="material-icons right">send</i>
+          </button>
         </div>
-        <div class="row">
-          <div class="input-field col s6">
-            <input  id="course" type="text" class="validate">
-            <label for="course">Course Code</label>
-          </div>
-          <div class="input-field col s6">
-            <input id="rating" type="number" max="5" min = "0" class="validate">
-            <label for="rating">Rating</label>
-          </div>
+        <div>
+            <form class>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input  id="ClaimHash" type="text" class="validate">
+                  <label for="ClaimHash">Listing Hash</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="ChallengeID" type="number" class="validate">
+                  <label for="ChallengeID">ChallengeID</label>
+                </div>
+              </div>
+            </form>
+          <button class="btn waves-effect waves-light" onclick="App.Claim()">Claim Rewards
+              <i class="material-icons right">attach_money</i>
+          </button>
         </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input  id="review" type="text" class="validate">
-            <label for="review">Review</label>
-          </div>
-        </div>
-      </form>
+
+      </div>
+
+      <div class="col s4 center-align">
+          <form>
+            <div class="row">
+              <div class="input-field col s6">
+                <input  id="VoteHash" type="text" class="validate">
+                <label for="VoteHash">Listing hash</label>
+              </div>
+              <div class="input-field col s6">
+                <input id="VoteAmount" type="number" class="validate">
+                <label for="VoteAmount">Amount</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input  id="Vote" type="number" max="1" min = "0"class="validate">
+                <label for="Vote">Vote</label>
+              </div>
+            </div>
+          </form>
+          <button class="btn waves-effect waves-light" onclick="App.vote()">Vote  
+              <i class="material-icons right">send</i>
+          </button>
+      </div>
     </div>
-    <center>
-      <button onclick="App.propose()">Propose</button>
-    </center>
-
-        <br/>
-        <br/>
-
-    <div class="row">
-      <form class="col s12">
-        <div class="row">
-          <div class="input-field col s6">
-            <input  id="hash" type="text" class="validate">
-            <label for="hash">Listing hash</label>
-          </div>
-          <div class="input-field col s6">
-            <input id="challenge_amount" type="number" class="validate">
-            <label for="challenge_amount">Amount</label>
-          </div>
-        </div>
-      </form>
-    </div>
-    <center>
-      <button onclick="App.challenge()">Challenge</button>
-    </center>
-      
-    <br/>
-    <br/>
-
-    <div class="row">
-      <form class="col s12">
-        <div class="row">
-          <div class="input-field col s6">
-            <input  id="VoteHash" type="text" class="validate">
-            <label for="VoteHash">Listing hash</label>
-          </div>
-          <div class="input-field col s6">
-            <input id="VoteAmount" type="number" class="validate">
-            <label for="VoteAmount">Amount</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input  id="Vote" type="number" max="1" min = "0"class="validate">
-            <label for="Vote">Vote</label>
-          </div>
-        </div>
-      </form>
-    </div>
-    <center>
-      <button onclick="App.vote()">Vote</button>
-    </center>
-
-    <br/>
-    <br/>
-
     
-    <div class="row">
+    <!-- <div class="row">
       <form class="col s12">
         <div class="row">
           <div class="input-field col s6">
@@ -155,7 +171,7 @@
     </div>
     <center>
       <button onclick="App.Claim()">Claim Rewards</button>
-    </center>
+    </center> -->
     <!-- 
     Amount: <input type="number" id="amount" />
     Roll: <input type="text" id="roll" />
