@@ -190,12 +190,15 @@ App = {
       $(document).ready(function(){
         $('.collapsible').collapsible();
         $('.tooltipped').tooltip();
-        $('.copy_content').click(function(){
+        $('.copy_content').click(function(e){
           var $temp = $("<input>");
-          $("body").append($temp);
-          $temp.val(this.text()).select();
+          $temp.val(e.target.innerText);
+          // var $temp = e.target;
+          // $("body").append($temp);
+          console.log($temp[0]);
+          document.body.appendChild($temp[0]);
+          $temp[0].select();
           document.execCommand("copy");
-          $temp.remove();
         });
       });
 
