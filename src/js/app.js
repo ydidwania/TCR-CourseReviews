@@ -3,13 +3,22 @@
 
 
 let oneReviewDiv = function({roll, review, rating, lHash, wl}){
+  let icon;
+  if (wl){
+    icon = "<i class=\"material-icons\ green-text\">verified_user</i>"
+  } else if(App.challenges[lHash]){ // challenge going on
+    icon = "<i class=\"material-icons\ red-text\">thumbs_up_down</i>"
+  } else{
+    icon = "<i class=\"material-icons\ yellow-text\">watch_later</i>"
+  }
+
   return(
     `<div class="row hoverable">
         <div class="col s2">${roll}</div>
         <div class="col s4">${review}</div>
-        <div class="col s1">${rating}</div>
-        <div class="col s1">${wl}</div>
-        <div class="col s4">${lHash}</div>
+        <div class="col s1">${rating}<i class=\"material-icons yellow-text\">star</i>"</div>
+        <div class="col s1">${icon}</div>
+        <div class="col s3 tooltipped data-position=\"bottom\" data-tooltip=\"Click to Copy\" truncate copy_content">${lHash}</div>
     </div>`
   );
 }
@@ -57,14 +66,14 @@ App = {
       // Instantiate a new truffle contract from the artifact
       let abi = tcr.abi;
       console.log(App.web3);
-      App.tcrInstance = new App.web3.eth.Contract(abi, "0x2660c458C6f90d2EbA26A478c0e90d329075a0E2");
+      App.tcrInstance = new App.web3.eth.Contract(abi, "0xa570D419ce5d72464fEb4058cdc6D045E5768588");
       // Connect provider to interact with contract
       App.tcrInstance.setProvider(App.web3Provider);
       //App.listenForEvents();
     }).then(function () {
       $.getJSON("Token.json", function (token) {
         let abi = token.abi;
-        App.tokenInstance = new App.web3.eth.Contract(abi, "0x1baFDfC807e402Ca92993b874B83b5Ce49e571c7");
+        App.tokenInstance = new App.web3.eth.Contract(abi, "0xa881f356F852B5907456c61B81F4F325A7f602Df");
         // Connect provider to interact with contract
         App.tokenInstance.setProvider(App.web3Provider);
         
@@ -124,6 +133,11 @@ App = {
     // let listings = []];
     
     App.tcrInstance.methods.getAllListings().call().then(function (l) {
+      if(l==null){
+        loader.hide();
+        content.show();
+        return;
+      }
       for (let i = 0; i < l[0].length; i++) {
         let item = {};
         let rev = l[0][i].split(' ');
@@ -160,7 +174,7 @@ App = {
             reviewDivs.push(oneReviewDiv(item))
         });
         
-        let cBody = "<div class=\"collapsible-body\">" + reviewDivs.join()+"</div>"
+        let cBody = "<div class=\"collapsible-body\">" + reviewDivs.join(' ')+"</div>"
         reviewList.append(`<li>${cHeader}${cBody}</li>`);
       });
       loader.hide();
@@ -168,6 +182,14 @@ App = {
       
       $(document).ready(function(){
         $('.collapsible').collapsible();
+        $('.tooltipped').tooltip();
+        $('.copy_content').click(function(){
+          var $temp = $("<input>");
+          $("body").append($temp);
+          $temp.val(this.text()).select();
+          document.execCommand("copy");
+          $temp.remove();
+        });
       });
 
     });
