@@ -118,23 +118,24 @@ contract Tcr {
         pollNonce = INITIAL_POLL_NONCE;
     }
 
-   function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
-    if (_i == 0) {
-        return "0";
-    }
-    uint j = _i;
-    uint len;
-    while (j != 0) {
-        len++;
-        j /= 10;
-    }
-    bytes memory bstr = new bytes(len);
-    uint k = len - 1;
-    while (_i != 0) {
-        bstr[k--] = byte(uint8(48 + _i % 10));
-        _i /= 10;
-    }
-    return string(bstr);
+    function uint2str(uint _i) internal pure returns (string memory ) {
+        if (_i == 0) {
+            return "0";
+        }
+        uint j = _i;
+        uint len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(len);
+        uint k = len - 1;
+        j = _i;
+        while (j != 0) {
+            bstr[k--] = byte(uint8(48 + j % 10));
+            j /= 10;
+        }
+        return string(bstr);
 	}
 
     function strReview(Data memory data) private pure returns (string memory){
@@ -154,40 +155,30 @@ contract Tcr {
     // get all listing names (for UI)
     // not to be used in a production use case
     function getAllListings() public view returns (string[] memory, bytes32[] memory, bool[] memory) {
-        uint count = 0;
+        // uint count = 0;
         Listing memory templisting;
+        // for (uint256 i = 0; i < listingNames.length; i++) {
+            // templisting = listings[listingHashes[i]];
+            // if(bytes(templisting.data.course).length > 0)
+                // count = count + 1;
+        // }
+        // string[] memory listingArr = new string[](count);
+        // bytes32[] memory hashArr = new bytes32[](count);
+        // bool[] memory whitelistedArr = new bool[](count);
+
+        string[] memory listingArr = new string[](listingNames.length);
+        bytes32[] memory hashArr = new bytes32[](listingNames.length);
+        bool[] memory whitelistedArr = new bool[](listingNames.length);
+
         for (uint256 i = 0; i < listingNames.length; i++) {
             templisting = listings[listingHashes[i]];
-            if(bytes(templisting.data.course).length > 0)
-                count = count + 1;
-            }
-        string[] memory listingArr = new string[](count);
-        bytes32[] memory hashArr = new bytes32[](count);
-        bool[] memory whitelistedArr = new bool[](count);
-        
-        for (uint256 i = 0; i < listingNames.length; i++) {
-            templisting = listings[listingHashes[i]];
-            if(bytes(templisting.data.course).length > 0)
-            {
-            listingArr[i] = strReview(templisting.data);
-	        hashArr[i] = listingHashes[i];
-            whitelistedArr[i] = templisting.whitelisted;}
-            }
-        return (listingArr, hashArr, whitelistedArr);
-    }
-
-    function getAllCourses() public view returns (string[] memory,uint[] memory, uint[] memory) {
-        string[] memory courseArr = new string[](courseNames.length);
-	    uint[] memory coursetotalArr = new uint[](courseNames.length);
-	    uint[] memory numberReviewsArr = new uint[] (courseNames.length);
-
-        for (uint256 i = 0; i < courseNames.length; i++) {
-            courseArr[i] = courseNames[i];
-	        Course memory temp_course = courses[courseNames[i]];
-	        coursetotalArr[i] = temp_course.courseTotal;
-    	    numberReviewsArr[i] = temp_course.numberOfReviews;
+            // if(bytes(templisting.data.course).length > 0) {
+                listingArr[i] = strReview(templisting.data);
+                hashArr[i] = listingHashes[i];
+                whitelistedArr[i] = templisting.whitelisted;
+            // }
         }
-        return (courseArr, coursetotalArr, numberReviewsArr);
+        return (listingArr, hashArr, whitelistedArr);
     }
 
     // get details of this registry (for UI)
@@ -203,11 +194,6 @@ contract Tcr {
         require(appWasMade(_listingHash) || listingIns.whitelisted, "Listing does not exist.");
 
         return (listingIns.whitelisted, listingIns.owner, listingIns.deposit, listingIns.challengeId,strReview(listingIns.data));
-    }
-
-    function getCourseDetails(string memory _courseHash) public view returns (string memory, uint, uint){
-	    Course memory courseIns = courses[_courseHash];
-	    return (courseIns.courseCode, courseIns.courseTotal.div(courseIns.numberOfReviews),courseIns.numberOfReviews);
     }
 
     function CourseExists(string memory _courseHash) public view returns (uint) {

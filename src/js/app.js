@@ -21,7 +21,7 @@ let oneReviewDiv = function({roll, review, rating, lHash, wl}){
     `<div class="row">`
     +  reload
     +  `<div class="col s5">${review}</div>
-        <div class="col s2">${rating} <i class="material-icons orange-text">star</i> </div>
+        <div class="col s2">${rating} <i class="material-icons tiny orange-text">star</i> </div>
         <div class="col s1">${icon}</div>
         <div class="col s3 tooltipped truncate copy_content"  data-tooltip="Click to Copy">
         ${lHash}</div>
@@ -59,13 +59,13 @@ App = {
     if (typeof web3 !== 'undefined') {
       // If a web3 instance is already provided by Meta Mask.
       App.web3Provider = web3.currentProvider;
-      App.web3 = new Web3(web3.currentProvider);
+      web3 = new Web3(web3.currentProvider);
     } else {
       // Specify default instance if no web3 instance provided
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:8545');
-      App.web3 = new Web3(App.web3Provider);
+      web3 = new Web3(App.web3Provider);
     }
-    // App.web3 = web3;
+    App.web3 = web3;
     return App.initContract();
   },
 
@@ -73,13 +73,17 @@ App = {
     $.getJSON("Tcr.json", function (tcr) {
       // Instantiate a new truffle contract from the artifact
       let abi = tcr.abi;
-      App.tcrInstance = new App.web3.eth.Contract(abi, "0x2660c458C6f90d2EbA26A478c0e90d329075a0E2");
+      console.log(App.web3);
+      App.tcrInstance = new App.web3.eth.Contract(abi, "0x1Cc861bb43f53ED6Ad68D5040F63e7Dc683d691A");
       // Connect provider to interact with contract
       App.tcrInstance.setProvider(App.web3Provider);
+      App.listenForEvents();
+
+
     }).then(function () {
       $.getJSON("Token.json", function (token) {
         let abi = token.abi;
-        App.tokenInstance = new App.web3.eth.Contract(abi, "0x1baFDfC807e402Ca92993b874B83b5Ce49e571c7");
+        App.tokenInstance = new App.web3.eth.Contract(abi, "0x239Ed6f19F5543CA5be789A1241D569B3bA836DE");
         // Connect provider to interact with contract
         App.tokenInstance.setProvider(App.web3Provider);
         
@@ -95,13 +99,8 @@ App = {
       App.tcrInstance.options.from = App.account;
       App.tokenInstance.options.from = App.account;
 
-      App.tcrInstance.methods.getDetails().call().then(function (details) {
-        let appLen = parseInt(details[3]);
-        console.log("Hello");
-        // setInterval(App.updateStatus  , appLen*1000);
-      });
-
       return App.readHistory();
+      // return App.render();
     });
   },
 
@@ -135,6 +134,8 @@ App = {
   
   render: function () {
     // var tcrInstance;
+    console.log("Rendering");
+
     var loader = $("#loader");
     var content = $("#content");
 
@@ -144,8 +145,14 @@ App = {
     // Load contract data
     let courses = {};
     // let listings = []];
-    
-    App.tcrInstance.methods.getAllListings().call().then(function (l) {
+    console.log("About to get all listings");
+    App.tcrInstance.methods.getAllListings().call(function (error, l) {
+      console.log("all listings got");
+      if(error){
+        console.log("ERROR in get all listing");
+        console.error(error);
+        return;
+      }
       if(l==null){
         loader.hide();
         content.show();
@@ -154,6 +161,8 @@ App = {
       for (let i = 0; i < l[0].length; i++) {
         let item = {};
         let rev = l[0][i].split('|');
+        if(rev[1] === "")
+          continue;
         item = {
           'roll': rev[0],
           'review': rev[2],
@@ -174,6 +183,7 @@ App = {
             'data': [item],
           };
         }
+        console.log("handle listing",i);
       }
       console.log(courses);
       App.courses = courses;
@@ -214,6 +224,7 @@ App = {
       });
 
     });
+    console.log("exiting render");
   },
 
   copy_content: function(text){
@@ -239,45 +250,72 @@ App = {
     let rating = $('#rating').val();
     console.log(amount);
 
-    App.tokenInstance.methods.approve(App.tcrInstance.options.address, 10000)
+    App.tokenInstance.methods.approve(App.tcrInstance.options.address, amount)
     .send(function(r){
     App.tcrInstance.methods.propose(amount, roll, course_code, review, rating).send(console.log)
     .on('error',function(error){alert("Failed")})
     });  
+    document.getElementById("proposeForm").reset();
   },
 
   challenge: async function () {
     let hash = $('#hash').val();
     let amount = $('#challenge_amount').val();
-    App.tokenInstance.methods.approve(App.tcrInstance.options.address, 10000)
+    App.tokenInstance.methods.approve(App.tcrInstance.options.address, amount)
     .send(function(r){
     App.tcrInstance.methods.challenge(hash, amount).send(console.log)
     .on('error',function(error){alert("Failed")})
     });
+    document.getElementById("challengeForm").reset();
   },
 
   vote: async function () {
     let hash = $('#VoteHash').val();
     let amount = $('#VoteAmount').val();
-    let choice = $('#Vote').val();
-    App.tokenInstance.methods.approve(App.tcrInstance.options.address, 10000)
+    let vote = $('#Vote').val();
+    let choice = false;
+    if (vote != 0)
+        choice = true;
+    App.tokenInstance.methods.approve(App.tcrInstance.options.address, amount)
     .send(function(r){
     App.tcrInstance.methods.vote(hash, amount, choice).send(console.log)
     .on('error',function(error){alert("Failed")})
     });
+    document.getElementById("voteForm").reset();
   },
 
-  // Claim has to done by you. This is not correct
+
   Claim: async function () {
-    let hash = $('#ClaimHash').val();
+    //let hash = $('#ClaimHash').val();
+    let flag = 0;
     let id = $('#ChallengeID').val();
-    App.tcrInstance.methods.updateStatus(hash).send(function(r){
-    App.tcrInstance.methods.claimRewards(id).send()
-    .on('error',function(error){alert("Failed")})} )
-    .on('error',function(error){alert("Failed")});
+    Object.keys(App.challenges).forEach(function(key) {
+      
+      if (App.challenges[key] = id) {
+        console.log('Key : ' + key + ', Value : ' + App.challenges[key]);
+        //var hash = App.web3.utils.fromAscii(key);
+        let $temp = key; 
+        var hash = $temp//.val() 
+        console.log(hash)     
+        //var hash = bytes32(parseInt(key, 32));
+        App.tcrInstance.methods.updateStatus(hash).send(function(r){
+        App.tcrInstance.methods.claimRewards(id).send()
+        .on('error',function(error){alert("Failed")})} )
+        .on('error',function(error){alert("Failed")});
+        flag = 1;
+      /* App.tcrInstance.methods.updateStatus(hash).send
+        .on('error',function(error){alert("Failed")});*/
+      }
+    });
+    //let hash = App.challenges[lHash]
+    if (flag == 0)
+     { App.tcrInstance.methods.claimRewards(id).send()
+      .on('error',function(error){alert("Failed")})
+     }
+     document.getElementById("claimForm").reset();
   },
 
-  listenForEvents: async function() {
+  listenForEvents:  function() {
     var latestBlock;
     App.web3.eth.getBlockNumber()
     .then(function(b){
@@ -340,6 +378,15 @@ App = {
         }
       }
     }); 
+
+    window.ethereum.on('accountsChanged', function (accounts) {
+      // Time to reload your interface with accounts[0]!
+      App.account = accounts[0];
+      console.log(App.account)
+      App.tcrInstance.options.from = App.account;
+      App.tokenInstance.options.from = App.account;
+    })
+    
   },
 
   updateStatus: function(lHash){

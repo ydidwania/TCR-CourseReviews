@@ -2,16 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TCR Course Reviews</title>
 
     <!-- Bootstrap -->
     <!-- Compiled and minified CSS -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link type="text/css" href="css/materialize.min.css" />
     
-
+  
   </head>
   <body>
     <div class="container" style="width: 650px;">
@@ -56,7 +57,7 @@
  
     <div class="row">
       <div class="center-align col s4">
-        <form>
+        <form id="proposeForm">
           <div class="row">
             <div class="input-field col s6">
               <input  id="amount" type="number" class="validate">
@@ -95,7 +96,7 @@
 
       <div class="center-align col s4">
         <div>
-          <form class="col s12">
+          <form class="col s12" id="challengeForm">
             <div class="row">
               <div class="input-field col s6">
                 <input  id="hash" type="text" class="validate">
@@ -112,13 +113,9 @@
           </button>
         </div>
         <div>
-            <form class>
+            <form class id="claimForm">
               <div class="row">
-                <div class="input-field col s6">
-                  <input  id="ClaimHash" type="text" class="validate">
-                  <label for="ClaimHash">Listing Hash</label>
-                </div>
-                <div class="input-field col s6">
+                <div class="input-field col s12">
                   <input id="ChallengeID" type="number" class="validate">
                   <label for="ChallengeID">ChallengeID</label>
                 </div>
@@ -132,7 +129,7 @@
       </div>
 
       <div class="col s4 center-align">
-          <form>
+          <form id="voteForm">
             <div class="row">
               <div class="input-field col s6">
                 <input  id="VoteHash" type="text" class="validate">
@@ -159,11 +156,7 @@
     <!-- <div class="row">
       <form class="col s12">
         <div class="row">
-          <div class="input-field col s6">
-            <input  id="ClaimHash" type="text" class="validate">
-            <label for="ClaimHash">Listing Hash</label>
-          </div>
-          <div class="input-field col s6">
+          <div class="input-field col s12">
             <input id="ChallengeID" type="number" class="validate">
             <label for="ChallengeID">ChallengeID</label>
           </div>
@@ -173,43 +166,7 @@
     <center>
       <button onclick="App.Claim()">Claim Rewards</button>
     </center> -->
-    <!-- 
-    Amount: <input type="number" id="amount" />
-    Roll: <input type="text" id="roll" />
-    <br/>
-    Course_code: <input type="text" id="course" />
-    Review: <input type="text" id="review" />
-    <br/>
-    Rating: <input type="number" id="rating" />
-    <button onclick="App.propose()">Propose</button>
-
-    <br/>
-    <br/>
-    <br/>
-    ChallengeHash: <input type="text" id="hash" />
-    ChallengeAmount: <input type="number" id="challenge_amount" />
-    <br/>
-    <button onclick="App.challenge()">Challenge</button>
-    <br/>
-    <br/>
-    <br/>
-
-    VoteHash: <input type="text" id="VoteHash" />
-    VoteAmount: <input type="number" id="VoteAmount" />
-    <br/>
-    Vote: <input type="number" id="Vote" />
-    <button onclick="App.vote()">Vote</button>
-    <br/>
-    <br/>
-    <br/>
-
-    Listing Hash: <input type="text" id="ClaimHash" />
-    Challenge ID: <input type="number" id="ChallengeID" />
-    <button onclick="App.Claim()">ClaimRewards</button>   
-    <hr />
-    </form>
-     -->
-    
+   
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
